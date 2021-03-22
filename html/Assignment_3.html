@@ -1,0 +1,964 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Assignment_3</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-03-21"><meta name="DC.source" content="Assignment_3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Assignment 3</a></li><li><a href="#2">Part 1: Modified Monte-Carlo simulator without bottle-neck</a></li><li><a href="#3">Part 2: Modified Finite Difference Method</a></li><li><a href="#4">Part 3: Device investigation and parameter extraction</a></li></ul></div><h2 id="1">Assignment 3</h2><pre class="language-matlab">Monte-Carlo/Finite Difference <span class="string">Method</span>
+</pre><pre>Author: Ragini Bakshi, March 2021</pre><pre class="codeinput">set(0,<span class="string">'DefaultFigureWindowStyle'</span>,<span class="string">'docked'</span>)
+set(0, <span class="string">'defaultaxesfontsize'</span>, 12)
+set(0, <span class="string">'defaultaxesfontname'</span>, <span class="string">'Times New Roman'</span>)
+set(0, <span class="string">'DefaultLineLineWidth'</span>,2);
+
+clear <span class="string">all</span>
+close <span class="string">all</span>
+
+<span class="comment">% Constants taken directly from 4700 Repo DriftDiffTran</span>
+<span class="keyword">global</span> C
+
+C.q_0 = 1.60217653e-19;             <span class="comment">% electron charge</span>
+C.hb = 1.054571596e-34;             <span class="comment">% Dirac constant</span>
+C.h = C.hb*2*pi;                    <span class="comment">% Planck constant</span>
+C.m_0 = 9.10938215e-31;             <span class="comment">% resting electron mass in kg</span>
+C.kb = 1.3806504e-23;               <span class="comment">% Boltzmann constant</span>
+C.eps_0 = 8.854187817e-12;          <span class="comment">% vacuum permittivity</span>
+C.Mun_0 = 1.2566370614e-6;          <span class="comment">% vacuum permeability</span>
+C.c = 299792458;                    <span class="comment">% speed of light</span>
+C.m_n = 0.26*C.m_0;                 <span class="comment">% effective mass of electrons in kg</span>
+
+<span class="comment">% Simulation Parameters</span>
+width = 200e-9;         <span class="comment">% nm goes along x axis</span>
+height = 100e-9;        <span class="comment">% nm goes along y axis</span>
+Temp = 300;             <span class="comment">% Temp in K</span>
+tmn = 0.2e-13;          <span class="comment">% mean time between collisions</span>
+
+C.Vt = C.kb*Temp/C.q_0;
+</pre><h2 id="2">Part 1: Modified Monte-Carlo simulator without bottle-neck</h2><p>V = 0.1V is applied across the x axis of the semiconductor Assuming the Electric field is constant over the semiconductor:</p><pre class="codeinput">elec_field_x = 1 / width         <span class="comment">% in V/m</span>
+elec_field_y = 0.1/width;                  <span class="comment">% no electric field in y-direction yet</span>
+
+<span class="comment">% b. Force on each electron is also constant because of constant E</span>
+force_on_e_x = C.q_0*elec_field_x  <span class="comment">% in kg-m/s^2</span>
+force_on_e_y = C.q_0*elec_field_y  <span class="comment">% in kg-m/s^2</span>
+
+<span class="comment">% c. Acceleration on the electrons: a = Force/effective mass of electron</span>
+acc_on_e_x = force_on_e_x / C.m_n  <span class="comment">% in m/s^2</span>
+acc_on_e_y = force_on_e_y / C.m_n  <span class="comment">% in m/s^2</span>
+
+<span class="comment">% d. The relationship between electron drift current density and average</span>
+<span class="comment">% carrier velocity is given by:</span>
+<span class="comment">% J[drift current density] = q [e- charge] * electron concentration * v_th [thermal velocity]</span>
+C.conc = 10e15*100*100;              <span class="comment">% given electron concentration in m^-2</span>
+v_th = sqrt((2*C.kb*Temp)/C.m_n);    <span class="comment">% Thermal Velocity in m/s</span>
+MFP = v_th*tmn;                      <span class="comment">% mean free path</span>
+
+<span class="comment">% Mean Free Path is the average free path an electron travels before it</span>
+<span class="comment">% experiences scattering due to background features such as impurities,</span>
+<span class="comment">% silicon imperfections, etc.</span>
+
+<span class="comment">% 2D plot that demonstrates their curved trajectories:</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%% INSERT SIM from A1 HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Part 1 Simulation: Modified Assignment 1</span>
+<span class="comment">% Part 1 Parameters</span>
+steps = 100;                    <span class="comment">% number of steps</span>
+total_elec = 100;               <span class="comment">% total number of electrons simulated</span>
+n_elec = 10;                    <span class="comment">% number of electrons plotted</span>
+dt = width/(v_th*100);          <span class="comment">% spacial time step is smaller than 1/100 of region size</span>
+path_pinks = hsv(n_elec);       <span class="comment">% colours for each path/trajectory</span>
+
+<span class="comment">%Scattering probability setup</span>
+nominal_prob_scat = 1 - (exp(-1*dt/tmn));           <span class="comment">% remains constant, is defined by exponential scattering probability equation</span>
+prob_at_each_electron = rand(total_elec,1);    <span class="comment">% is different for each electron</span>
+
+
+<span class="comment">% Assign position and velocity to each electron in the array</span>
+<span class="keyword">for</span> i = 1:total_elec
+    x = rand(total_elec,1)*width;           <span class="comment">% x position</span>
+    y = rand(total_elec,1)*height;          <span class="comment">% y position</span>
+    x_vel_row(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         <span class="comment">% x velocity with mean v_th and std deviation sqrt(kT/m)</span>
+    y_vel_row(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         <span class="comment">% x velocity with mean v_th and std deviation sqrt(kT/m)</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Convert X_vel_row and Y_vel_row into columns for future vector operations</span>
+<span class="comment">% and add new x velocity component due to electric field</span>
+x_vel = x_vel_row' + acc_on_e_x*dt;
+y_vel = y_vel_row' + acc_on_e_y*dt;
+
+<span class="comment">% time t for temperature</span>
+t = [1:steps].*dt;
+
+<span class="keyword">for</span> step = 1:steps
+    x_old(1) = x(1);
+    y_old(1) = y(1)';
+    Si_temp(1) = 300;
+
+    <span class="keyword">for</span> j = 1:total_elec
+        <span class="comment">%Used for plotting</span>
+        x_old(j) = x(j);
+        y_old(j) = y(j);
+        dontplot_2 = false;               <span class="comment">% if it wraps around edges, dont plot the line</span>
+        <span class="comment">% scatter if applicable</span>
+        <span class="keyword">if</span>(nominal_prob_scat &gt; 2*rand())
+            <span class="comment">% reset x and y velocities to random numbers</span>
+            x_vel(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+            y_vel(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Move the electron if its ok</span>
+        <span class="keyword">if</span> y(j) &lt; 0
+            <span class="comment">% its going past the bottom edge; reflect it</span>
+            y_vel(j) = y_vel(j)*(-1);
+            y(j) = 0;
+            x(j) = x(j) + x_vel(j)*dt + 0.5*acc_on_e_x*dt*dt;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+
+        <span class="keyword">elseif</span> y(j) &gt; height
+            <span class="comment">% its going past the top edge; reflect it</span>
+            y_vel(j) = y_vel(j)*(-1) + acc_on_e_y*dt;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y(j) = height;
+            x(j) = x(j) + x_vel(j)*dt;
+
+        <span class="keyword">elseif</span> x(j) &lt; 0
+            <span class="comment">% its going past the left edge; wrap it to right</span>
+            x(j) = width;
+            <span class="keyword">if</span> y_vel(j) &gt; 0
+                y(j) = y(j) + 2e-9;
+            <span class="keyword">else</span> y(j) = y(j) - 2e-9;
+            <span class="keyword">end</span>
+            dontplot_2 = true;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+
+        <span class="keyword">elseif</span> x(j) &gt; width
+            <span class="comment">% its going past the right edge; wrap it to left</span>
+            x(j) = 0;
+            <span class="keyword">if</span> y_vel(j) &gt; 0
+                y(j) = y(j) + 2e-9;
+            <span class="keyword">else</span> y(j) = y(j) - 2e-9;
+            <span class="keyword">end</span>
+            dontplot_2 = true;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+
+        <span class="keyword">else</span> <span class="comment">% update position and velocities</span>
+            x(j) = x(j) + x_vel(j)*dt + 0.5*acc_on_e_x*dt*dt;
+            y(j) = y(j) + y_vel(j)*dt + 0.5*acc_on_e_y*dt*dt;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+        <span class="keyword">end</span>
+
+        <span class="keyword">if</span>(j &lt; n_elec &amp;&amp; dontplot_2 == false)
+            figure(1)
+            plot([x_old(j) x(j)],[y_old(j) y(j)],<span class="string">'Color'</span>, path_pinks(j,:))
+            title(<span class="string">'Electron Trajectories'</span>);
+            axis([0 width 0 height])
+            xlabel(<span class="string">'Width'</span>)
+            ylabel(<span class="string">'Length'</span>)
+            hold <span class="string">on</span>
+            pause(0.01)
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+    x_v_mean(step) = mean(x_vel);
+    J(step) = C.conc*C.q_0*x_v_mean(step);
+
+
+    Si_temp(step) = (mean((sum(x_vel).^2)+ sum(y_vel).^2))*C.m_n / (C.kb*2*10^4);
+
+<span class="keyword">end</span>
+
+<span class="comment">% Plot of current over time in the x direction:</span>
+figure(2)
+plot(t,J)
+title(<span class="string">'Drift Current Density vs Time in the x direction'</span>)
+xlabel(<span class="string">'Time (s)'</span>)
+ylabel(<span class="string">'Drift Current Density'</span>)
+
+<span class="comment">% figure(3)</span>
+<span class="comment">% plot(Si_temp)</span>
+<span class="comment">% hold on;</span>
+<span class="comment">% title('Temp vs Time')</span>
+<span class="comment">% xlabel('Time (s)')</span>
+<span class="comment">% ylabel('Temp (K)')</span>
+
+<span class="comment">% e. Density and temperature maps:</span>
+figure(3)
+[gridX, gridY] = meshgrid(linspace(min(x), max(x), 200), linspace(min(y), max(y), 100));
+surf(griddata(x, y, Si_temp, gridX, gridY));
+title(<span class="string">'Temperature Map'</span>)
+
+figure(4)
+[grid_curr_X, grid_curr_Y] = meshgrid(linspace(0, width, 200), linspace(0, height, 100));
+surf(griddata(x, y, J, grid_curr_X, grid_curr_Y));
+title(<span class="string">'Drift Current Density Map'</span>);
+</pre><pre class="codeoutput">
+elec_field_x =
+
+     5000000
+
+
+force_on_e_x =
+
+   8.0109e-13
+
+
+force_on_e_y =
+
+   8.0109e-14
+
+
+acc_on_e_x =
+
+   3.3823e+18
+
+
+acc_on_e_y =
+
+   3.3823e+17
+
+</pre><img vspace="5" hspace="5" src="Assignment_3_01.png" alt=""> <img vspace="5" hspace="5" src="Assignment_3_02.png" alt=""> <img vspace="5" hspace="5" src="Assignment_3_03.png" alt=""> <img vspace="5" hspace="5" src="Assignment_3_04.png" alt=""> <h2 id="3">Part 2: Modified Finite Difference Method</h2><p>Aim here is to calculate an Electric Field and use as input to Monte-Carlo with bottleneck</p><pre class="codeinput"><span class="comment">% a. Potential with the bottle-neck inserted:</span>
+part = 2;       <span class="comment">% saddle shape</span>
+nx = 200;
+ny = 100;
+
+[Curr, Vmap, Ex, Ey, eFlowx, eFlowy ] = ass_3_Solve(nx, ny, 100, 10e-9, [0.8 0], part);
+force_in_x = Ex*1e9*C.q_0;
+acc_in_x = force_in_x ./ C.m_n;
+
+force_in_y = Ey*1e9*C.q_0;
+acc_in_y = force_in_y ./ C.m_n;
+
+<span class="comment">% Plot boxes</span>
+Boxes = {};
+Boxes{1}.X = [0.8 1.2]*1e-7;
+Boxes{1}.Y = [0.6 1.0]*1e-7;
+Boxes{1}.BC = <span class="string">'s'</span>;
+
+Boxes{2}.X = [0.8 1.2]*1e-7;
+Boxes{2}.Y = [0.0 0.4]*1e-7;
+Boxes{2}.BC = <span class="string">'s'</span>;
+
+<span class="comment">%</span>
+<span class="comment">% Width = 100;</span>
+<span class="comment">% Height = 50;</span>
+<span class="comment">%</span>
+<span class="comment">% x = linspace(-Width/2, Width/2, nx);</span>
+<span class="comment">% y = linspace(0, Height, ny);</span>
+<span class="comment">% V = zeros(nx, ny);</span>
+<span class="comment">%</span>
+<span class="comment">% figure(6)</span>
+<span class="comment">% view(45, 45)</span>
+<span class="comment">% b = Width/2;</span>
+<span class="comment">% a = Height;</span>
+
+<span class="comment">% 3D plot of potential = surface plot of V(x,y)</span>
+<span class="comment">% 2D electric field vector plot using quiver</span>
+figure(6)
+view(45, 45)
+subplot(2,1,1), H = surf(Vmap');
+set(H, <span class="string">'linestyle'</span>, <span class="string">'none'</span>);
+title(<span class="string">'3D plot of potential = surface plot of V(x,y)'</span>)
+view(0,90)
+subplot(2,1,2),quiver(Ex', Ey');
+axis([0 nx 0 ny]);
+title(<span class="string">'2D electric field vector plot using quiver'</span>);
+
+<span class="comment">% b. Electric Field potential calculation done in function ass_3_Solve</span>
+
+<span class="comment">% c. Using this field as input to MC in part 1 and the resultant 2D plot of</span>
+<span class="comment">% particle trajectories under the new Electric field</span>
+figure(7)
+plot([Boxes{1}.X(1), Boxes{1}.X(1)], [Boxes{1}.Y], <span class="string">'r'</span>);
+hold <span class="string">on</span>;
+plot([Boxes{1}.X(2), Boxes{2}.X(2)], [Boxes{1}.Y], <span class="string">'r'</span>);
+hold <span class="string">on</span>;
+plot([Boxes{1}.X(2), Boxes{2}.X(2)], [Boxes{2}.Y], <span class="string">'r'</span>);
+hold <span class="string">on</span>;
+plot([Boxes{1}.X(1), Boxes{1}.X(1)], [Boxes{2}.Y], <span class="string">'r'</span>);
+hold <span class="string">on</span>;
+plot([Boxes{1}.X(1), Boxes{1}.X(2)], [Boxes{1}.Y(1), Boxes{1}.Y(1)], <span class="string">'r'</span>);
+hold <span class="string">on</span>;
+plot([Boxes{2}.X(1), Boxes{2}.X(2)], [Boxes{2}.Y(2), Boxes{2}.Y(2)], <span class="string">'r'</span>);
+hold <span class="string">on</span>;
+axis([0 width 0 height]);
+title(<span class="string">'Location of boxes'</span>)
+hold <span class="string">on</span>;
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%% INSERT SIM from A1 HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">% Part 2 Simulation: Modified Assignment 1 + 2</span>
+<span class="comment">% Part 2 Parameters</span>
+steps = 100;                    <span class="comment">% number of steps</span>
+total_elec = 100;               <span class="comment">% total number of electrons simulated</span>
+n_elec = 10;                    <span class="comment">% number of electrons plotted</span>
+dt = width/(v_th*100);          <span class="comment">% spacial time step is smaller than 1/100 of region size</span>
+path_pinks = hsv(n_elec);       <span class="comment">% colours for each path/trajectory</span>
+
+<span class="comment">%Scattering probability setup</span>
+nominal_prob_scat = 1 - (exp(-1*dt/tmn));           <span class="comment">% remains constant, is defined by exponential scattering probability equation</span>
+
+<span class="comment">% Assign position and velocity to each electron in the array</span>
+<span class="keyword">for</span> i = 1:total_elec
+    x_position = rand(total_elec,1)*width;           <span class="comment">% x position</span>
+    y_position = rand(total_elec,1)*height;          <span class="comment">% y position</span>
+
+    xlim = (x_position(i) &lt;= 1.2*10-7) &amp;&amp; (x_position(i) &gt;= 0.8*10-7);
+    ylim = (y_position(i) &lt;= 0.4*10-7) || (y_position(i) &gt;= 0.6*10-7);
+
+    <span class="keyword">while</span>(xlim &amp;&amp; ylim) <span class="comment">%while starting within box, rerandomize</span>
+        x_position = rand(total_elec,1)*width;           <span class="comment">% x position</span>
+        y_position = rand(total_elec,1)*height;          <span class="comment">% y position</span>
+    <span class="keyword">end</span>
+
+    x_vel_roww(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         <span class="comment">% x velocity with mean v_th and std deviation sqrt(kT/m)</span>
+    y_vel_roww(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         <span class="comment">% x velocity with mean v_th and std deviation sqrt(kT/m)</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Convert X_vel_row and Y_vel_row into columns for future vector operations</span>
+<span class="comment">% and add new x velocity component due to electric field</span>
+x_velocity = x_vel_roww'; <span class="comment">%+ acc_in_x*dt;</span>
+y_velocity = y_vel_roww'; <span class="comment">%+ acc_in_y*dt;</span>
+
+<span class="comment">% time t for temperature</span>
+t = 0;
+t = [1:steps].*dt;
+
+step = 0;       <span class="comment">% reset step</span>
+x_old = zeros(1,steps);
+y_old = zeros(1,steps);
+Si_temp = zeros(1,steps);
+
+<span class="keyword">for</span> step = 1:steps
+    x_old(1) = x_position(1);
+    y_old(1) = y_position(1)';
+    Si_temp(1) = 300;
+
+    <span class="keyword">for</span> j = 1:total_elec
+        <span class="comment">% logical limits for boxes</span>
+        y_lim_2 = (y_position &gt;= 0.6*10^-7);
+        y_lim_1 = (y_position &lt;= 0.4*10^-7);
+        x_lim_l = (x_position &gt;= 0.8*10^-7);
+        x_lim_r = (x_position &lt;= 1.2*10^-7);
+
+
+
+        <span class="comment">%Used for plotting</span>
+        x_old(j) = x_position(j);
+        y_old(j) = y_position(j);
+        dontplot_2 = false;               <span class="comment">% if it wraps around edges, dont plot the line</span>
+
+        <span class="comment">% scatter if applicable</span>
+        <span class="keyword">if</span>(nominal_prob_scat &gt; 2*rand())
+            <span class="comment">% reset x and y velocities to random numbers</span>
+            x_velocity(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+            y_velocity(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Move the electron if its ok</span>
+        <span class="keyword">if</span> y_position(j) &lt; 0
+            <span class="comment">% its going past the bottom edge; reflect it</span>
+            y_velocity(j) = y_velocity(j)*(-1);
+            y_position(j) = 0;
+            x_position(j) = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_x(i,j)*dt*dt;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+
+        <span class="comment">%elseif (top edge of bottom box)</span>
+<span class="comment">%         elseif (y_lim_1 &amp;&amp; x_lim_r &amp;&amp; x_lim_l)</span>
+<span class="comment">%             y_velocity = -1*y_velocity(j);</span>
+<span class="comment">%             %x_velocity = unchanged</span>
+<span class="comment">%             x_position = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_x(i,j)*dt*dt;</span>
+<span class="comment">%             y_position = 0.4*10^-7;</span>
+
+        <span class="keyword">elseif</span> y(j) &gt; height
+            <span class="comment">% its going past the top edge; reflect it</span>
+            y_velocity(j) = y_velocity(j)*(-1) + acc_in_y(i,j)*dt;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_position(j) = height;
+            x_position(j) = x_position(j) + x_velocity(j)*dt;
+
+<span class="comment">%         %elseif (bottom edge of top box)</span>
+<span class="comment">%         elseif (y_lim_2 &amp;&amp; x_lim_r &amp;&amp; x_lim_l)</span>
+<span class="comment">%             y_velocity = -1*y_velocity(j);</span>
+<span class="comment">%             %x_velocity =</span>
+<span class="comment">%             x_position = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_x(i,j)*dt*dt;</span>
+<span class="comment">%             y_position = 0.6*10^-7;</span>
+
+<span class="comment">%         %elseif left edges of boxes</span>
+<span class="comment">%         elseif (y_position &lt;= 0.4*10^-7 &amp;&amp; (x_position &lt;= 1.2*10-7 &amp;&amp; x_position &gt;= 0.8*10^-7))</span>
+<span class="comment">%             y_velocity =</span>
+<span class="comment">%             x_velocity =</span>
+<span class="comment">%             x_position =</span>
+<span class="comment">%             y_position =</span>
+<span class="comment">%</span>
+<span class="comment">%         %elseif right edges of boxes</span>
+<span class="comment">%         elseif (y_position &lt;= 0.4*10^-7 &amp;&amp; (x_position &lt;= 1.2*10-7 &amp;&amp; x_position &gt;= 0.8*10^-7))</span>
+<span class="comment">%             y_velocity =</span>
+<span class="comment">%             x_velocity =</span>
+<span class="comment">%             x_position =</span>
+<span class="comment">%             y_position =</span>
+
+        <span class="keyword">elseif</span> x_position(j) &lt; 0
+            <span class="comment">% its going past the left edge; wrap it to right</span>
+            x_position(j) = width;
+            <span class="keyword">if</span> y_velocity(j) &gt; 0
+                y_position(j) = y_position(j) + 2e-9;
+            <span class="keyword">else</span> y_position(j) = y_position(j) - 2e-9;
+            <span class="keyword">end</span>
+            dontplot_2 = true;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+
+        <span class="keyword">elseif</span> x_position(j) &gt; width
+            <span class="comment">% its going past the right edge; wrap it to left</span>
+            x_position(j) = 0;
+            <span class="keyword">if</span> y_velocity(j) &gt; 0
+                y_position(j) = y_position(j) + 2e-9;
+            <span class="keyword">else</span> y_position(j) = y_position(j) - 2e-9;
+            <span class="keyword">end</span>
+            dontplot_2 = true;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+
+        <span class="keyword">else</span> <span class="comment">% update position and velocities</span>
+            x_position(j) = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_y(i,j)*dt*dt;
+            y_position(j) = y_position(j) + y_velocity(j)*dt + 0.5*acc_in_y(i,j)*dt*dt;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+        <span class="keyword">end</span>
+
+        <span class="keyword">if</span>(j &lt; n_elec &amp;&amp; dontplot_2 == false)
+            figure(8)
+            plot([x_old(j) x(j)],[y_old(j) y(j)],<span class="string">'Color'</span>, path_pinks(j,:))
+            title(<span class="string">'Electron Trajectories'</span>);
+            axis([0 width 0 height])
+            xlabel(<span class="string">'Width'</span>)
+            ylabel(<span class="string">'Length'</span>)
+            hold <span class="string">on</span>
+            pause(0.01)
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+    x_mean(step) = mean(x_velocity);
+    J_2(step) = C.conc*C.q_0*x_mean(step);
+
+    Si_temp(step) = (mean((sum(x_vel).^2)+ sum(y_vel).^2))*C.m_n / (C.kb*2*10^4);
+
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="Assignment_3_05.png" alt=""> <img vspace="5" hspace="5" src="Assignment_3_06.png" alt=""> <img vspace="5" hspace="5" src="Assignment_3_07.png" alt=""> <img vspace="5" hspace="5" src="Assignment_3_08.png" alt=""> <h2 id="4">Part 3: Device investigation and parameter extraction</h2><p>a. Density Map Plot at 0.8V field</p><pre class="codeinput"><span class="comment">% b. Average current at different bottleneck widths (plot and calculaion)</span>
+
+<span class="comment">% c. To make this simulation more accurate, the most obvious way would be to increase the sample size</span>
+<span class="comment">% of electrons being simulated, decrease the dt, and simulate for longer.</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Assignment 3
+%   Monte-Carlo/Finite Difference Method
+%
+%  Author: Ragini Bakshi, March 2021
+
+set(0,'DefaultFigureWindowStyle','docked')
+set(0, 'defaultaxesfontsize', 12)
+set(0, 'defaultaxesfontname', 'Times New Roman')
+set(0, 'DefaultLineLineWidth',2);
+
+clear all
+close all
+
+% Constants taken directly from 4700 Repo DriftDiffTran
+global C
+
+C.q_0 = 1.60217653e-19;             % electron charge
+C.hb = 1.054571596e-34;             % Dirac constant
+C.h = C.hb*2*pi;                    % Planck constant
+C.m_0 = 9.10938215e-31;             % resting electron mass in kg
+C.kb = 1.3806504e-23;               % Boltzmann constant
+C.eps_0 = 8.854187817e-12;          % vacuum permittivity
+C.Mun_0 = 1.2566370614e-6;          % vacuum permeability
+C.c = 299792458;                    % speed of light
+C.m_n = 0.26*C.m_0;                 % effective mass of electrons in kg
+
+% Simulation Parameters
+width = 200e-9;         % nm goes along x axis
+height = 100e-9;        % nm goes along y axis
+Temp = 300;             % Temp in K
+tmn = 0.2e-13;          % mean time between collisions
+
+C.Vt = C.kb*Temp/C.q_0;
+
+%% Part 1: Modified Monte-Carlo simulator without bottle-neck
+% V = 0.1V is applied across the x axis of the semiconductor
+% Assuming the Electric field is constant over the semiconductor:
+
+elec_field_x = 1 / width         % in V/m
+elec_field_y = 0.1/width;                  % no electric field in y-direction yet
+
+% b. Force on each electron is also constant because of constant E
+force_on_e_x = C.q_0*elec_field_x  % in kg-m/s^2
+force_on_e_y = C.q_0*elec_field_y  % in kg-m/s^2
+
+% c. Acceleration on the electrons: a = Force/effective mass of electron
+acc_on_e_x = force_on_e_x / C.m_n  % in m/s^2
+acc_on_e_y = force_on_e_y / C.m_n  % in m/s^2
+
+% d. The relationship between electron drift current density and average
+% carrier velocity is given by: 
+% J[drift current density] = q [e- charge] * electron concentration * v_th [thermal velocity]
+C.conc = 10e15*100*100;              % given electron concentration in m^-2
+v_th = sqrt((2*C.kb*Temp)/C.m_n);    % Thermal Velocity in m/s
+MFP = v_th*tmn;                      % mean free path
+
+% Mean Free Path is the average free path an electron travels before it
+% experiences scattering due to background features such as impurities,
+% silicon imperfections, etc.
+
+% 2D plot that demonstrates their curved trajectories:
+%%%%%%%%%%%%%%%%%%%%%%%% INSERT SIM from A1 HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Part 1 Simulation: Modified Assignment 1
+% Part 1 Parameters
+steps = 100;                    % number of steps
+total_elec = 100;               % total number of electrons simulated
+n_elec = 10;                    % number of electrons plotted
+dt = width/(v_th*100);          % spacial time step is smaller than 1/100 of region size
+path_pinks = hsv(n_elec);       % colours for each path/trajectory
+
+%Scattering probability setup
+nominal_prob_scat = 1 - (exp(-1*dt/tmn));           % remains constant, is defined by exponential scattering probability equation
+prob_at_each_electron = rand(total_elec,1);    % is different for each electron
+
+
+% Assign position and velocity to each electron in the array
+for i = 1:total_elec
+    x = rand(total_elec,1)*width;           % x position
+    y = rand(total_elec,1)*height;          % y position
+    x_vel_row(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         % x velocity with mean v_th and std deviation sqrt(kT/m)
+    y_vel_row(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         % x velocity with mean v_th and std deviation sqrt(kT/m)
+end
+
+% Convert X_vel_row and Y_vel_row into columns for future vector operations
+% and add new x velocity component due to electric field
+x_vel = x_vel_row' + acc_on_e_x*dt;
+y_vel = y_vel_row' + acc_on_e_y*dt;
+
+% time t for temperature
+t = [1:steps].*dt;
+
+for step = 1:steps
+    x_old(1) = x(1);
+    y_old(1) = y(1)';
+    Si_temp(1) = 300;
+       
+    for j = 1:total_elec
+        %Used for plotting
+        x_old(j) = x(j);
+        y_old(j) = y(j);
+        dontplot_2 = false;               % if it wraps around edges, dont plot the line
+        % scatter if applicable
+        if(nominal_prob_scat > 2*rand())
+            % reset x and y velocities to random numbers
+            x_vel(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+            y_vel(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+        end
+                
+        % Move the electron if its ok
+        if y(j) < 0
+            % its going past the bottom edge; reflect it
+            y_vel(j) = y_vel(j)*(-1);
+            y(j) = 0;
+            x(j) = x(j) + x_vel(j)*dt + 0.5*acc_on_e_x*dt*dt;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+            
+        elseif y(j) > height
+            % its going past the top edge; reflect it
+            y_vel(j) = y_vel(j)*(-1) + acc_on_e_y*dt;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y(j) = height;
+            x(j) = x(j) + x_vel(j)*dt;
+            
+        elseif x(j) < 0
+            % its going past the left edge; wrap it to right
+            x(j) = width;
+            if y_vel(j) > 0
+                y(j) = y(j) + 2e-9;
+            else y(j) = y(j) - 2e-9;
+            end
+            dontplot_2 = true;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+            
+        elseif x(j) > width
+            % its going past the right edge; wrap it to left
+            x(j) = 0;
+            if y_vel(j) > 0
+                y(j) = y(j) + 2e-9;
+            else y(j) = y(j) - 2e-9;
+            end
+            dontplot_2 = true;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+            
+        else % update position and velocities
+            x(j) = x(j) + x_vel(j)*dt + 0.5*acc_on_e_x*dt*dt;
+            y(j) = y(j) + y_vel(j)*dt + 0.5*acc_on_e_y*dt*dt;
+            x_vel(j) = x_vel(j) + acc_on_e_x*dt;
+            y_vel(j) = y_vel(j) + acc_on_e_y*dt;
+        end
+        
+        if(j < n_elec && dontplot_2 == false)
+            figure(1)
+            plot([x_old(j) x(j)],[y_old(j) y(j)],'Color', path_pinks(j,:))
+            title('Electron Trajectories');
+            axis([0 width 0 height])
+            xlabel('Width')
+            ylabel('Length')
+            hold on
+            pause(0.01)
+        end
+        
+    end
+    x_v_mean(step) = mean(x_vel);
+    J(step) = C.conc*C.q_0*x_v_mean(step); 
+    
+    
+    Si_temp(step) = (mean((sum(x_vel).^2)+ sum(y_vel).^2))*C.m_n / (C.kb*2*10^4);
+    
+end
+
+% Plot of current over time in the x direction:
+figure(2)
+plot(t,J)
+title('Drift Current Density vs Time in the x direction')
+xlabel('Time (s)')
+ylabel('Drift Current Density')
+
+% figure(3)
+% plot(Si_temp)
+% hold on;
+% title('Temp vs Time')
+% xlabel('Time (s)')
+% ylabel('Temp (K)')
+
+% e. Density and temperature maps:
+figure(3)
+[gridX, gridY] = meshgrid(linspace(min(x), max(x), 200), linspace(min(y), max(y), 100));
+surf(griddata(x, y, Si_temp, gridX, gridY));
+title('Temperature Map')
+
+figure(4)
+[grid_curr_X, grid_curr_Y] = meshgrid(linspace(0, width, 200), linspace(0, height, 100));
+surf(griddata(x, y, J, grid_curr_X, grid_curr_Y));
+title('Drift Current Density Map');
+
+
+%% Part 2: Modified Finite Difference Method 
+% Aim here is to calculate an Electric Field and use as input to Monte-Carlo with bottleneck
+
+% a. Potential with the bottle-neck inserted:
+part = 2;       % saddle shape
+nx = 200;
+ny = 100;
+
+[Curr, Vmap, Ex, Ey, eFlowx, eFlowy ] = ass_3_Solve(nx, ny, 100, 10e-9, [0.8 0], part);
+force_in_x = Ex*1e9*C.q_0;
+acc_in_x = force_in_x ./ C.m_n;
+
+force_in_y = Ey*1e9*C.q_0;
+acc_in_y = force_in_y ./ C.m_n;
+
+% Plot boxes
+Boxes = {};
+Boxes{1}.X = [0.8 1.2]*1e-7;
+Boxes{1}.Y = [0.6 1.0]*1e-7;
+Boxes{1}.BC = 's';
+
+Boxes{2}.X = [0.8 1.2]*1e-7;
+Boxes{2}.Y = [0.0 0.4]*1e-7;
+Boxes{2}.BC = 's';
+
+% 
+% Width = 100;
+% Height = 50;
+% 
+% x = linspace(-Width/2, Width/2, nx);
+% y = linspace(0, Height, ny);
+% V = zeros(nx, ny);
+% 
+% figure(6)
+% view(45, 45)
+% b = Width/2;
+% a = Height;
+
+% 3D plot of potential = surface plot of V(x,y)
+% 2D electric field vector plot using quiver
+figure(6)
+view(45, 45)
+subplot(2,1,1), H = surf(Vmap');
+set(H, 'linestyle', 'none');
+title('3D plot of potential = surface plot of V(x,y)')
+view(0,90)
+subplot(2,1,2),quiver(Ex', Ey');
+axis([0 nx 0 ny]);
+title('2D electric field vector plot using quiver');
+
+% b. Electric Field potential calculation done in function ass_3_Solve
+
+% c. Using this field as input to MC in part 1 and the resultant 2D plot of
+% particle trajectories under the new Electric field
+figure(7)
+plot([Boxes{1}.X(1), Boxes{1}.X(1)], [Boxes{1}.Y], 'r');
+hold on;
+plot([Boxes{1}.X(2), Boxes{2}.X(2)], [Boxes{1}.Y], 'r');
+hold on;
+plot([Boxes{1}.X(2), Boxes{2}.X(2)], [Boxes{2}.Y], 'r');
+hold on;
+plot([Boxes{1}.X(1), Boxes{1}.X(1)], [Boxes{2}.Y], 'r');
+hold on;
+plot([Boxes{1}.X(1), Boxes{1}.X(2)], [Boxes{1}.Y(1), Boxes{1}.Y(1)], 'r');
+hold on;
+plot([Boxes{2}.X(1), Boxes{2}.X(2)], [Boxes{2}.Y(2), Boxes{2}.Y(2)], 'r');
+hold on;
+axis([0 width 0 height]);
+title('Location of boxes')
+hold on;
+%%%%%%%%%%%%%%%%%%%%%%%% INSERT SIM from A1 HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Part 2 Simulation: Modified Assignment 1 + 2
+% Part 2 Parameters
+steps = 100;                    % number of steps
+total_elec = 100;               % total number of electrons simulated
+n_elec = 10;                    % number of electrons plotted
+dt = width/(v_th*100);          % spacial time step is smaller than 1/100 of region size
+path_pinks = hsv(n_elec);       % colours for each path/trajectory
+
+%Scattering probability setup
+nominal_prob_scat = 1 - (exp(-1*dt/tmn));           % remains constant, is defined by exponential scattering probability equation
+
+% Assign position and velocity to each electron in the array
+for i = 1:total_elec
+    x_position = rand(total_elec,1)*width;           % x position
+    y_position = rand(total_elec,1)*height;          % y position
+    
+    xlim = (x_position(i) <= 1.2*10-7) && (x_position(i) >= 0.8*10-7);
+    ylim = (y_position(i) <= 0.4*10-7) || (y_position(i) >= 0.6*10-7);
+    
+    while(xlim && ylim) %while starting within box, rerandomize
+        x_position = rand(total_elec,1)*width;           % x position
+        y_position = rand(total_elec,1)*height;          % y position
+    end
+    
+    x_vel_roww(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         % x velocity with mean v_th and std deviation sqrt(kT/m)
+    y_vel_roww(i) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;         % x velocity with mean v_th and std deviation sqrt(kT/m)
+end
+
+% Convert X_vel_row and Y_vel_row into columns for future vector operations
+% and add new x velocity component due to electric field
+x_velocity = x_vel_roww'; %+ acc_in_x*dt;
+y_velocity = y_vel_roww'; %+ acc_in_y*dt;
+
+% time t for temperature
+t = 0;
+t = [1:steps].*dt;
+
+step = 0;       % reset step
+x_old = zeros(1,steps);
+y_old = zeros(1,steps);
+Si_temp = zeros(1,steps);
+
+for step = 1:steps
+    x_old(1) = x_position(1);
+    y_old(1) = y_position(1)';
+    Si_temp(1) = 300;
+       
+    for j = 1:total_elec
+        % logical limits for boxes
+        y_lim_2 = (y_position >= 0.6*10^-7);
+        y_lim_1 = (y_position <= 0.4*10^-7);
+        x_lim_l = (x_position >= 0.8*10^-7);
+        x_lim_r = (x_position <= 1.2*10^-7);
+        
+        
+        
+        %Used for plotting
+        x_old(j) = x_position(j);
+        y_old(j) = y_position(j);
+        dontplot_2 = false;               % if it wraps around edges, dont plot the line
+        
+        % scatter if applicable
+        if(nominal_prob_scat > 2*rand())
+            % reset x and y velocities to random numbers
+            x_velocity(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+            y_velocity(j) = sqrt(C.kb*Temp/C.m_0)+randn()*v_th;
+        end
+                
+        % Move the electron if its ok
+        if y_position(j) < 0 
+            % its going past the bottom edge; reflect it
+            y_velocity(j) = y_velocity(j)*(-1);
+            y_position(j) = 0;
+            x_position(j) = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_x(i,j)*dt*dt;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+            
+        %elseif (top edge of bottom box)
+%         elseif (y_lim_1 && x_lim_r && x_lim_l)
+%             y_velocity = -1*y_velocity(j);
+%             %x_velocity = unchanged
+%             x_position = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_x(i,j)*dt*dt;
+%             y_position = 0.4*10^-7;
+            
+        elseif y(j) > height 
+            % its going past the top edge; reflect it
+            y_velocity(j) = y_velocity(j)*(-1) + acc_in_y(i,j)*dt;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_position(j) = height;
+            x_position(j) = x_position(j) + x_velocity(j)*dt;
+            
+%         %elseif (bottom edge of top box)
+%         elseif (y_lim_2 && x_lim_r && x_lim_l)
+%             y_velocity = -1*y_velocity(j);
+%             %x_velocity = 
+%             x_position = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_x(i,j)*dt*dt;
+%             y_position = 0.6*10^-7;
+            
+%         %elseif left edges of boxes
+%         elseif (y_position <= 0.4*10^-7 && (x_position <= 1.2*10-7 && x_position >= 0.8*10^-7))
+%             y_velocity = 
+%             x_velocity = 
+%             x_position = 
+%             y_position = 
+%             
+%         %elseif right edges of boxes
+%         elseif (y_position <= 0.4*10^-7 && (x_position <= 1.2*10-7 && x_position >= 0.8*10^-7))
+%             y_velocity = 
+%             x_velocity = 
+%             x_position = 
+%             y_position = 
+            
+        elseif x_position(j) < 0
+            % its going past the left edge; wrap it to right
+            x_position(j) = width;
+            if y_velocity(j) > 0
+                y_position(j) = y_position(j) + 2e-9;
+            else y_position(j) = y_position(j) - 2e-9;
+            end
+            dontplot_2 = true;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+            
+        elseif x_position(j) > width
+            % its going past the right edge; wrap it to left
+            x_position(j) = 0;
+            if y_velocity(j) > 0
+                y_position(j) = y_position(j) + 2e-9;
+            else y_position(j) = y_position(j) - 2e-9;
+            end
+            dontplot_2 = true;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+            
+        else % update position and velocities
+            x_position(j) = x_position(j) + x_velocity(j)*dt + 0.5*acc_in_y(i,j)*dt*dt;
+            y_position(j) = y_position(j) + y_velocity(j)*dt + 0.5*acc_in_y(i,j)*dt*dt;
+            x_velocity(j) = x_velocity(j) + acc_in_x(i,j)*dt;
+            y_velocity(j) = y_velocity(j) + acc_in_y(i,j)*dt;
+        end
+        
+        if(j < n_elec && dontplot_2 == false)
+            figure(8)
+            plot([x_old(j) x(j)],[y_old(j) y(j)],'Color', path_pinks(j,:))
+            title('Electron Trajectories');
+            axis([0 width 0 height])
+            xlabel('Width')
+            ylabel('Length')
+            hold on
+            pause(0.01)
+        end
+        
+    end
+    x_mean(step) = mean(x_velocity);
+    J_2(step) = C.conc*C.q_0*x_mean(step);  
+    
+    Si_temp(step) = (mean((sum(x_vel).^2)+ sum(y_vel).^2))*C.m_n / (C.kb*2*10^4);
+    
+end
+
+
+
+%% Part 3: Device investigation and parameter extraction
+% a. Density Map Plot at 0.8V field
+
+% b. Average current at different bottleneck widths (plot and calculaion)
+
+% c. To make this simulation more accurate, the most obvious way would be to increase the sample size
+% of electrons being simulated, decrease the dt, and simulate for longer. 
+
+
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
